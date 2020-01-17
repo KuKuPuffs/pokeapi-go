@@ -4,16 +4,19 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 const (
 	// BaseURL ...
-	BaseURL = "https://pokeapi.co/api/v2/"
+	BaseURL = "https://pokeapi.co/api/v2"
 	// UserAgent ...
 	UserAgent = "poke-go"
 )
@@ -29,7 +32,7 @@ type Client struct {
 func NewClient(httpClient *http.Client) *Client {
 	if httpClient.Transport == nil {
 		httpClient = &http.Client{
-			Timeout: 100 * time.Second,
+			Timeout: 1000 * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true,
@@ -41,13 +44,10 @@ func NewClient(httpClient *http.Client) *Client {
 	if err != nil {
 		log.Fatal("can't parse Poke URL")
 	}
-	// fmt.Printf("baseURL: %v\n", BaseURL)
-	pokeURL := baseURL.ResolveReference(baseURL)
-	// fmt.Printf("pokeURL: %v\n", pokeURL)
 
 	return &Client{
 		HTTPClient: httpClient,
-		BaseURL:    pokeURL,
+		BaseURL:    baseURL,
 		UserAgent:  UserAgent,
 	}
 }
@@ -87,8 +87,11 @@ func OptionHTTPClient(client *http.Client) func(*Client) {
 }
 
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
-	relPath := &url.URL{Path: path}
-	URL := c.BaseURL.ResolveReference(relPath)
+	rel, err := url.Parse(path)
+	if err != nil {
+		return nil, errors.Wrap(err, "error parsing relative path URL")
+	}
+	pokeURL := fmt.Sprintf("%v%v", c.BaseURL, rel)
 
 	var buf io.ReadWriter
 	if body != nil {
@@ -99,7 +102,8 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 		}
 	}
 
-	req, err := http.NewRequest(method, URL.String(), buf)
+	fmt.Printf("URL to parse: %v\n", pokeURL)
+	req, err := http.NewRequest(method, pokeURL, buf)
 	if err != nil {
 		return nil, err
 	}
@@ -120,6 +124,10 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
 		err = resp.Body.Close()
 	}()
 
-	err = json.NewDecoder(resp.Body).Decode(v)
-	return resp, err
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("response code from server error, got: %d, want: %d", resp.StatusCode, http.StatusOK)
+	}
+
+	decodeErr := json.NewDecoder(resp.Body).Decode(v)
+	return resp, decodeErr
 }

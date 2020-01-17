@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dzDiscoveryZone/pokeapi-go/pokeapi"
+	"github.com/dzdiscoveryzone/pokeapi-go/pokeapi"
 )
 
 var (
@@ -47,9 +47,19 @@ func assertHTTPMethod(t *testing.T, r *http.Request, want string) {
 // helper method to check the URL path
 func assertPath(t *testing.T, r *http.Request, wantPath string) {
 	t.Helper()
-	gotPath := r.URL.Path
-	t.Log("path: " + gotPath)
-	if gotPath != wantPath {
-		t.Fatalf("incorrct path used, want: %v, got: %v", wantPath, gotPath)
+
+	got := r.URL.Path
+	if got != wantPath {
+		t.Errorf("incorrct URL path used, got %v, want: %v", r.URL.Path, wantPath)
 	}
 }
+
+// helper method to validate the query parameter passed into the URL path
+//func assertQueryParam(t *testing.T, r *http.Request, query string, want string) {
+//	t.Helper()
+//
+//	param := r.URL.Query().Get(query)
+//	if param != want {
+//		t.Error("Url Param 'name' is missing")
+//	}
+//}
