@@ -54,12 +54,12 @@ func assertPath(t *testing.T, r *http.Request, wantPath string) {
 	}
 }
 
-// helper method to validate the query parameter passed into the URL path
-//func assertQueryParam(t *testing.T, r *http.Request, query string, want string) {
-//	t.Helper()
-//
-//	param := r.URL.Query().Get(query)
-//	if param != want {
-//		t.Error("Url Param 'name' is missing")
-//	}
-//}
+//helper method to validate the query parameter passed into the URL path
+func assertQueryParam(t *testing.T, r *http.Request, query string, want string) {
+	t.Helper()
+
+	param := r.URL.Query().Get(query)
+	if param != want {
+		t.Errorf("Url Param %s is missing", query)
+	}
+}

@@ -91,7 +91,8 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 	if err != nil {
 		return nil, errors.Wrap(err, "error parsing relative path URL")
 	}
-	pokeURL := fmt.Sprintf("%v%v", c.BaseURL, rel)
+
+	pokeURL := fmt.Sprintf("%v%v", c.BaseURL.String(), rel.String())
 
 	var buf io.ReadWriter
 	if body != nil {

@@ -85,7 +85,7 @@ type Pokemon struct {
 
 // GetPokemon ...
 func (c *Client) GetPokemon(pokemon string) (*Pokemon, error) {
-	pokemon = fmt.Sprintf("/pokemon/%v/", pokemon)
+	pokemon = fmt.Sprintf("/pokemon/%v", pokemon)
 	req, err := c.newRequest(http.MethodGet, pokemon, nil)
 	if err != nil {
 		return &Pokemon{}, nil
