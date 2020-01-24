@@ -32,7 +32,7 @@ type Client struct {
 func NewClient(httpClient *http.Client) *Client {
 	if httpClient.Transport == nil {
 		httpClient = &http.Client{
-			Timeout: 1000 * time.Second,
+			Timeout: 120 * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true,
