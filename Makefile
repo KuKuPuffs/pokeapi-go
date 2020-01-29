@@ -1,5 +1,5 @@
-GOCMD=go
-GOTEST=$(GOCMD) test
+GOCMD = go
+GOTEST = $(GOCMD) test
 
 test:
 	echo "testing poke api..."
