@@ -14,7 +14,7 @@ You can instantiate the pokeapi client in 2 ways:
 
 <br />
 
-2\. Using the functional options approach and providing an endpoint URL as well as   an http.CLient
+2\. Using the functional options approach and provide an endpoint URL as well as   an http.CLient
 ```go
     HTTPClient := &http.Client{Timeout: time.Millisecond * 100,
     			Transport: &http.Transport{TLSClientConfig: &tls.Config{
